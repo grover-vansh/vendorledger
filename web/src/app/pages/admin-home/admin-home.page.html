@@ -1,0 +1,130 @@
+<section class="dash">
+  <header class="dash-head">
+    <div>
+      <p class="eyebrow">Admin workspace</p>
+      <h1>Platform ledger</h1>
+      <p class="muted">Signed in as {{ adminEmail }}. You can see every registered user and supplier company.</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <p class="muted">Loading directory…</p>
+  } @else if (error()) {
+    <p class="form-error" role="alert">{{ error() }}</p>
+  } @else {
+    <div class="kpi-grid">
+      <article class="kpi">
+        <span>Users</span>
+        <strong>{{ users().length }}</strong>
+      </article>
+      <article class="kpi">
+        <span>Sellers</span>
+        <strong>{{ sellerCount() }}</strong>
+      </article>
+      <article class="kpi">
+        <span>Buyers</span>
+        <strong>{{ buyerCount() }}</strong>
+      </article>
+      <article class="kpi">
+        <span>Supplier companies</span>
+        <strong>{{ suppliers().length }}</strong>
+      </article>
+    </div>
+
+    <section class="panel">
+      <h2>Registered users</h2>
+      @if (users().length === 0) {
+        <p class="empty">No users yet.</p>
+      } @else {
+        <div class="table-wrap">
+          <table class="ledger">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Company</th>
+                <th>IDs</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of users(); track user.userId) {
+                <tr>
+                  <td>{{ user.email }}</td>
+                  <td>
+                    <span class="pill is-open">{{ roleLabel(user.role) }}</span>
+                  </td>
+                  <td>{{ user.companyName || '—' }}</td>
+                  <td class="mono muted">
+                    @if (user.supplierId) {
+                      supplier {{ user.supplierId }}
+                    }
+                    @if (user.buyerId) {
+                      buyer {{ user.buyerId }}
+                    }
+                    @if (!user.supplierId && !user.buyerId) {
+                      —
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+    <section class="panel">
+      <h2>Supplier companies</h2>
+      @if (suppliers().length === 0) {
+        <p class="empty">No suppliers yet. Register a seller, or add a company below.</p>
+      } @else {
+        <div class="table-wrap">
+          <table class="ledger">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>GSTIN</th>
+                <th>SKUs</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (supplier of suppliers(); track supplier.id) {
+                <tr>
+                  <td>{{ supplier.name }}</td>
+                  <td>{{ supplier.email || '—' }}</td>
+                  <td class="mono">{{ supplier.gstin || '—' }}</td>
+                  <td>{{ supplier.productCount }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <form class="inline-form" [formGroup]="form" (ngSubmit)="createSupplier()">
+        <h3>Add supplier company</h3>
+        @if (formError()) {
+          <p class="form-error" role="alert">{{ formError() }}</p>
+        }
+        <div class="inline-fields">
+          <label>
+            Name
+            <input type="text" formControlName="name" />
+          </label>
+          <label>
+            Email
+            <input type="email" formControlName="email" />
+          </label>
+          <label>
+            GSTIN
+            <input type="text" formControlName="gstin" />
+          </label>
+          <button class="btn-primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Add supplier' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+</section>

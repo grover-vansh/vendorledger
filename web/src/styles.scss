@@ -1,0 +1,398 @@
+:root {
+  --paper: #f3eee4;
+  --ink: #14241c;
+  --panel: #1b3328;
+  --leaf: #2f6f55;
+  --copper: #c4622d;
+  --gold: #e8c36a;
+  --card: #fffdf8;
+  --line: #d9d0c0;
+  --muted: #5c6b63;
+  --serif: "Fraunces", "Palatino Linotype", Georgia, serif;
+  --sans: "Figtree", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--serif);
+  font-weight: 600;
+  margin: 0 0 0.35em;
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.auth-split {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(320px, 460px);
+}
+
+.auth-story {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(232, 195, 106, 0.16), transparent 40%),
+    var(--panel);
+  color: #f4efe4;
+  padding: 64px 56px;
+}
+
+.auth-story h1 {
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  line-height: 1.1;
+  max-width: 12ch;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.lede {
+  font-size: 1.05rem;
+  line-height: 1.55;
+  max-width: 38ch;
+  opacity: 0.9;
+}
+
+.auth-story ul {
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.auth-story li {
+  padding-left: 18px;
+  position: relative;
+}
+
+.auth-story li::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+}
+
+.auth-panel {
+  background: var(--card);
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-left: 1px solid var(--line);
+}
+
+.auth-panel h2 {
+  font-size: 1.8rem;
+}
+
+.hint,
+.muted {
+  color: var(--muted);
+}
+
+.auth-panel form,
+.inline-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+}
+
+input:focus {
+  outline: 2px solid var(--leaf);
+  border-color: var(--leaf);
+}
+
+.btn-primary {
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 16px;
+  background: var(--panel);
+  color: #f4efe4;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.form-error {
+  background: #fde8dc;
+  color: #8a2f12;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+}
+
+.switch {
+  margin-top: 18px;
+  color: var(--muted);
+}
+
+.switch a {
+  color: var(--leaf);
+  font-weight: 700;
+}
+
+.role-grid {
+  border: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.role-grid legend {
+  font-size: 0.86rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.role-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px 12px 36px;
+  position: relative;
+  cursor: pointer;
+  background: #fff;
+}
+
+.role-card input {
+  position: absolute;
+  left: 12px;
+  top: 14px;
+}
+
+.role-card strong {
+  display: block;
+}
+
+.role-card span {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.82rem;
+}
+
+.role-card.selected {
+  border-color: var(--leaf);
+  box-shadow: inset 0 0 0 1px var(--leaf);
+}
+
+.dash-head {
+  margin-bottom: 22px;
+}
+
+.dash-head h1 {
+  font-size: 2rem;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.kpi {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.kpi span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kpi strong {
+  font-family: var(--serif);
+  font-size: 1.55rem;
+}
+
+.kpi-warn strong {
+  color: var(--copper);
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px 20px 8px;
+  margin-bottom: 16px;
+}
+
+.empty {
+  color: var(--muted);
+  padding-bottom: 12px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin: 0 -4px 12px;
+}
+
+.ledger {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.ledger th,
+.ledger td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.ledger th {
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mono {
+  font-variant-numeric: tabular-nums;
+  font-family: "Cascadia Mono", "Consolas", monospace;
+  font-size: 0.86rem;
+}
+
+.pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.is-overdue {
+  background: #fde8dc;
+  color: #8a2f12;
+}
+
+.is-paid {
+  background: #dcefe4;
+  color: #1b5c3c;
+}
+
+.is-soon {
+  background: #f8efd2;
+  color: #7a5b12;
+}
+
+.is-open {
+  background: #e7eee9;
+  color: #1b3328;
+}
+
+.overdue-text {
+  color: var(--copper);
+  font-weight: 700;
+}
+
+.sku-list {
+  list-style: none;
+  padding: 0 0 12px;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.sku-list li {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.inline-form {
+  margin: 16px 0 12px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+}
+
+.inline-form h3 {
+  font-size: 1.05rem;
+}
+
+.inline-fields {
+  display: grid;
+  grid-template-columns: 1.4fr 1.2fr 1fr auto;
+  gap: 10px;
+  align-items: end;
+  padding-bottom: 12px;
+}
+
+@media (max-width: 900px) {
+  .auth-split {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-story {
+    padding: 36px 24px;
+  }
+
+  .auth-panel {
+    border-left: 0;
+    padding: 32px 20px 48px;
+  }
+
+  .inline-fields {
+    grid-template-columns: 1fr;
+  }
+}

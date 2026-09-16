@@ -1,0 +1,11 @@
+backend/target/
+backend/.idea/
+*.iml
+.idea/
+.classpath
+.project
+.settings/
+*.log
+web/node_modules/
+web/dist/
+web/.angular/

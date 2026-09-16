@@ -1,0 +1,41 @@
+<section class="dash">
+  <header class="dash-head">
+    <div>
+      <p class="eyebrow">Buyer workspace</p>
+      <h1>{{ buyer()?.name || 'Your company' }}</h1>
+      <p class="muted">Bills suppliers have raised on you. MSME dues default to 45 days from invoice date.</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <p class="muted">Loading your bills…</p>
+  } @else if (error()) {
+    <p class="form-error" role="alert">{{ error() }}</p>
+  } @else {
+    <div class="kpi-grid">
+      <article class="kpi">
+        <span>Amount payable</span>
+        <strong>{{ formatInr(payable()) }}</strong>
+      </article>
+      <article class="kpi kpi-warn">
+        <span>Overdue bills</span>
+        <strong>{{ overdueCount() }}</strong>
+      </article>
+      <article class="kpi">
+        <span>Open bills</span>
+        <strong>{{ openCount() }}</strong>
+      </article>
+    </div>
+
+    <section class="panel">
+      <h2>Bills from suppliers</h2>
+      @if (invoices().length === 0) {
+        <p class="empty">
+          Nothing billed to you yet. When a seller links your company and issues an invoice, it will show here with due date and aging.
+        </p>
+      } @else {
+        <app-invoice-table [invoices]="invoices()" party="supplier" />
+      }
+    </section>
+  }
+</section>

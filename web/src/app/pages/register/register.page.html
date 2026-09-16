@@ -1,0 +1,63 @@
+<div class="auth-split">
+  <aside class="auth-story">
+    <p class="eyebrow">Create a workspace</p>
+    <h1>Join as buyer, seller, or admin</h1>
+    <p class="lede">
+      A seller account also creates your supplier company. A buyer account creates your buyer company. Admin is for internal ops.
+    </p>
+  </aside>
+
+  <section class="auth-panel">
+    <h2>Register</h2>
+    <p class="hint">Password must be at least 8 characters.</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      @if (error()) {
+        <p class="form-error" role="alert">{{ error() }}</p>
+      }
+      @if (form.errors?.['mismatch'] && form.touched) {
+        <p class="form-error" role="alert">Passwords do not match.</p>
+      }
+
+      <fieldset class="role-grid">
+        <legend>I am a</legend>
+        @for (role of roles; track role.value) {
+          <label class="role-card" [class.selected]="form.controls.role.value === role.value">
+            <input type="radio" formControlName="role" [value]="role.value" />
+            <strong>{{ role.title }}</strong>
+            <span>{{ role.copy }}</span>
+          </label>
+        }
+      </fieldset>
+
+      @if (needsCompany()) {
+        <label>
+          {{ companyLabel() }}
+          <input type="text" formControlName="name" autocomplete="organization" />
+        </label>
+      }
+
+      <label>
+        Email
+        <input type="email" formControlName="email" autocomplete="username" />
+      </label>
+      <label>
+        Password
+        <input type="password" formControlName="password" autocomplete="new-password" />
+      </label>
+      <label>
+        Confirm password
+        <input type="password" formControlName="confirm" autocomplete="new-password" />
+      </label>
+
+      <button class="btn-primary" type="submit" [disabled]="submitting()">
+        {{ submitting() ? 'Creating account…' : 'Create account' }}
+      </button>
+    </form>
+
+    <p class="switch">
+      Already registered?
+      <a routerLink="/login">Sign in</a>
+    </p>
+  </section>
+</div>

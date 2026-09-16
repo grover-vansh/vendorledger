@@ -1,0 +1,32 @@
+<div class="table-wrap">
+  <table class="ledger">
+    <thead>
+      <tr>
+        <th>Invoice</th>
+        <th>{{ party === 'supplier' ? 'Supplier' : 'Buyer' }}</th>
+        <th>Raised</th>
+        <th>Due</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Aging</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (invoice of invoices; track invoice.id) {
+        <tr>
+          <td class="mono">{{ invoice.invoiceNumber }}</td>
+          <td>{{ partyName(invoice) }}</td>
+          <td>{{ invoice.invoiceDate }}</td>
+          <td>{{ invoice.dueDate }}</td>
+          <td>{{ formatInr(invoice.totalAmount) }}</td>
+          <td>
+            <span class="pill {{ statusClass(invoice.status, invoice.daysOverdue) }}">
+              {{ invoice.status }}
+            </span>
+          </td>
+          <td [class.overdue-text]="invoice.daysOverdue > 0">{{ aging(invoice) }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
