@@ -6,6 +6,7 @@ import { BuyerHomePage } from './pages/buyer-home/buyer-home.page';
 import { HomeRedirectComponent } from './pages/home-redirect.component';
 import { LoginPage } from './pages/login/login.page';
 import { RegisterPage } from './pages/register/register.page';
+import { SellerBuyersPage } from './pages/seller-buyers/seller-buyers.page';
 import { SellerHomePage } from './pages/seller-home/seller-home.page';
 import { SellerInvoicePage } from './pages/seller-invoice/seller-invoice.page';
 import { SellerSkusPage } from './pages/seller-skus/seller-skus.page';
@@ -19,6 +20,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: 'seller', component: SellerHomePage, canActivate: [roleGuard('SELLER')] },
+      { path: 'seller/buyers', component: SellerBuyersPage, canActivate: [roleGuard('SELLER')] },
       { path: 'seller/skus', component: SellerSkusPage, canActivate: [roleGuard('SELLER')] },
       { path: 'seller/invoices/new', component: SellerInvoicePage, canActivate: [roleGuard('SELLER')] },
       { path: 'buyer', component: BuyerHomePage, canActivate: [roleGuard('BUYER')] },

@@ -145,25 +145,9 @@ paths:
         '409':
           description: Duplicate skuCode for this supplier
 
-  /api/buyers:
-    post:
-      summary: Create a buyer in the global list (does not link yet)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateBuyerRequest'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BuyerResponse'
   /api/buyers/{buyerId}:
     get:
-      summary: Get buyer profile
+      summary: Get a seller-owned buyer (seller, matching buyer email, or admin)
       parameters:
         - name: buyerId
           in: path
@@ -180,7 +164,7 @@ paths:
                 $ref: '#/components/schemas/BuyerResponse'
   /api/buyers/{buyerId}/invoices:
     get:
-      summary: Invoices billed to this buyer, with totals and aging
+      summary: Invoices billed to this seller-owned buyer, with totals and aging
       parameters:
         - name: buyerId
           in: path
@@ -198,30 +182,22 @@ paths:
                 items:
                   $ref: '#/components/schemas/InvoiceResponse'
 
-  /api/suppliers/{supplierId}/buyers/{buyerId}:
-    post:
-      summary: Link an existing buyer to this supplier (my customers)
-      parameters:
-        - $ref: '#/components/parameters/SupplierId'
-        - name: buyerId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+  /api/buyer/invoices:
+    get:
+      summary: Invoices billed to the current buyer user, matched by email across sellers
       responses:
-        '201':
-          description: Linked
+        '200':
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BuyerResponse'
-        '409':
-          description: Already linked
+                type: array
+                items:
+                  $ref: '#/components/schemas/InvoiceResponse'
 
   /api/suppliers/{supplierId}/buyers:
     get:
-      summary: List buyers linked to this supplier only
+      summary: List buyers that belong to this seller
       parameters:
         - $ref: '#/components/parameters/SupplierId'
       responses:
@@ -233,6 +209,25 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BuyerResponse'
+    post:
+      summary: Create a buyer for this seller
+      parameters:
+        - $ref: '#/components/parameters/SupplierId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBuyerRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuyerResponse'
+        '409':
+          description: Duplicate name, email, or GSTIN for this seller
 
   /api/invoices:
     post:
@@ -251,7 +246,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InvoiceResponse'
         '409':
-          description: Duplicate invoice number, or buyer not linked to supplier
+          description: Duplicate invoice number, or buyer does not belong to this seller
 
   /api/suppliers/{supplierId}/invoices:
     get:
@@ -317,18 +312,25 @@ components:
         registeredAt: { type: string, format: date-time }
     CreateBuyerRequest:
       type: object
-      required: [name]
+      required: [name, email]
       properties:
         name: { type: string }
-        email: { type: string }
-        gstin: { type: string }
+        email: { type: string, format: email }
+        gstin: { type: string, description: Optional 15-character GSTIN }
+        phone: { type: string }
+        contactName: { type: string }
+        billingAddress: { type: string }
     BuyerResponse:
       type: object
       properties:
-        id: { type: integer, format: int64 }
+        id: { type: integer, format: int64, description: Server-assigned; not entered by the seller }
+        supplierId: { type: integer, format: int64 }
         name: { type: string }
         email: { type: string }
         gstin: { type: string }
+        phone: { type: string }
+        contactName: { type: string }
+        billingAddress: { type: string }
         registeredAt: { type: string, format: date-time }
     CreateInvoiceLineRequest:
       type: object
@@ -402,7 +404,8 @@ components:
         email: { type: string }
         role: { type: string, enum: [BUYER, SELLER, ADMIN] }
         supplierId: { type: integer, format: int64, nullable: true }
-        buyerId: { type: integer, format: int64, nullable: true }
+        buyerId: { type: integer, format: int64, nullable: true, description: Always null; buyers are seller-owned records }
+        companyName: { type: string, nullable: true }
     UserSummaryResponse:
       type: object
       properties:
@@ -410,7 +413,7 @@ components:
         email: { type: string }
         role: { type: string, enum: [BUYER, SELLER, ADMIN] }
         supplierId: { type: integer, format: int64, nullable: true }
-        buyerId: { type: integer, format: int64, nullable: true }
+        buyerId: { type: integer, format: int64, nullable: true, description: Always null; buyers are seller-owned records }
         companyName: { type: string, nullable: true }
   securitySchemes:
     bearerAuth:

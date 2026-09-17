@@ -50,7 +50,7 @@ export class SellerHomePage {
     forkJoin({
       supplier: this.api.getSupplier(supplierId),
       products: this.api.listProducts(supplierId),
-      buyers: this.api.listLinkedBuyers(supplierId),
+      buyers: this.api.listMyBuyers(supplierId),
       invoices: this.api.listSupplierInvoices(supplierId)
     }).subscribe({
       next: (data) => {

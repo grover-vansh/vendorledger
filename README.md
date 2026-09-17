@@ -50,4 +50,5 @@ Open http://localhost:4200. The dev server proxies `/api` to Spring Boot on port
 
 - `/login` and `/register` (roles: buyer, seller, admin)
 - After login: `/seller`, `/buyer`, or `/admin`
+- Seller actions: `/seller/buyers`, `/seller/skus`, `/seller/invoices/new`
 

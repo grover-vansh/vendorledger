@@ -1,7 +1,6 @@
 package com.paydue.service;
 
 import com.paydue.api.dto.AuthResponse;
-import com.paydue.api.dto.CreateBuyerRequest;
 import com.paydue.api.dto.CreateSupplierRequest;
 import com.paydue.api.dto.LoginRequest;
 import com.paydue.api.dto.RegisterRequest;
@@ -9,7 +8,6 @@ import com.paydue.api.dto.UserSummaryResponse;
 import com.paydue.domain.AppUser;
 import com.paydue.domain.UserRole;
 import com.paydue.repo.AppUserRepository;
-import com.paydue.repo.BuyerRepository;
 import com.paydue.repo.SupplierRepository;
 import com.paydue.security.JwtService;
 import com.paydue.web.error.ConflictException;
@@ -25,7 +23,6 @@ public class AuthService {
     private final AppUserRepository users;
     private final PaydueService paydue;
     private final SupplierRepository suppliers;
-    private final BuyerRepository buyers;
     private final PasswordEncoder passwords;
     private final JwtService jwt;
 
@@ -33,13 +30,11 @@ public class AuthService {
             AppUserRepository users,
             PaydueService paydue,
             SupplierRepository suppliers,
-            BuyerRepository buyers,
             PasswordEncoder passwords,
             JwtService jwt) {
         this.users = users;
         this.paydue = paydue;
         this.suppliers = suppliers;
-        this.buyers = buyers;
         this.passwords = passwords;
         this.jwt = jwt;
     }
@@ -58,7 +53,8 @@ public class AuthService {
         }
 
         if (req.role() == UserRole.BUYER) {
-            if (users.existsByBuyer_NameIgnoreCase(req.name())) {
+            String company = req.name() == null ? "" : req.name().trim();
+            if (users.existsByRoleAndCompanyNameIgnoreCase(UserRole.BUYER, company)) {
                 throw new ConflictException("Buyer already registered");
             }
         }
@@ -71,10 +67,10 @@ public class AuthService {
             String company = req.name() == null || req.name().isBlank() ? email : req.name().trim();
             var supplier = paydue.createSupplier(new CreateSupplierRequest(company, email, null, true));
             user.setSupplier(suppliers.getReferenceById(supplier.id()));
+            user.setCompanyName(company);
         } else if (req.role() == UserRole.BUYER) {
             String company = req.name() == null || req.name().isBlank() ? email : req.name().trim();
-            var buyer = paydue.createBuyer(new CreateBuyerRequest(company, email, null));
-            user.setBuyer(buyers.getReferenceById(buyer.id()));
+            user.setCompanyName(company);
         } else if (req.role() != UserRole.ADMIN) {
             throw new IllegalArgumentException("role must be BUYER, SELLER, or ADMIN");
         }
@@ -106,19 +102,34 @@ public class AuthService {
 
     private AuthResponse toAuth(AppUser user, String token) {
         Long supplierId = user.getSupplier() == null ? null : user.getSupplier().getId();
-        Long buyerId = user.getBuyer() == null ? null : user.getBuyer().getId();
-        return AuthResponse.bearer(token, user.getId(), user.getEmail(), user.getRole(), supplierId, buyerId);
+        return AuthResponse.bearer(
+                token,
+                user.getId(),
+                user.getEmail(),
+                user.getRole(),
+                supplierId,
+                null,
+                companyName(user));
     }
 
     private static UserSummaryResponse toSummary(AppUser user) {
         Long supplierId = user.getSupplier() == null ? null : user.getSupplier().getId();
-        Long buyerId = user.getBuyer() == null ? null : user.getBuyer().getId();
-        String company = null;
-        if (user.getSupplier() != null) {
-            company = user.getSupplier().getName();
-        } else if (user.getBuyer() != null) {
-            company = user.getBuyer().getName();
+        return new UserSummaryResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getRole(),
+                supplierId,
+                null,
+                companyName(user));
+    }
+
+    private static String companyName(AppUser user) {
+        if (user.getCompanyName() != null && !user.getCompanyName().isBlank()) {
+            return user.getCompanyName();
         }
-        return new UserSummaryResponse(user.getId(), user.getEmail(), user.getRole(), supplierId, buyerId, company);
+        if (user.getSupplier() != null) {
+            return user.getSupplier().getName();
+        }
+        return null;
     }
 }

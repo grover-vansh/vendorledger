@@ -1,0 +1,108 @@
+<section class="dash">
+  <p class="page-back">
+    <a routerLink="/seller">← Seller workspace</a>
+  </p>
+
+  <header class="dash-head">
+    <div>
+      <p class="eyebrow">Customers</p>
+      <h1>Add Buyers</h1>
+      <p class="muted">
+        Buyers belong to your company only. PayDue assigns an internal ID — you just fill in who they are.
+      </p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <p class="muted">Loading buyers…</p>
+  } @else if (error()) {
+    <p class="form-error" role="alert">{{ error() }}</p>
+  } @else {
+    <section class="panel">
+      <h2>New buyer</h2>
+      <form class="sku-form" [formGroup]="form" (ngSubmit)="createBuyer()">
+        @if (formError()) {
+          <p class="form-error" role="alert">{{ formError() }}</p>
+        }
+        @if (form.controls.gstin.touched && form.controls.gstin.hasError('gstin')) {
+          <p class="form-error" role="alert">GSTIN must be 15 characters if you provide it.</p>
+        }
+        <div class="buyer-fields">
+          <label>
+            Company name
+            <input type="text" formControlName="name" maxlength="200" autocomplete="organization" />
+          </label>
+          <label>
+            Billing email
+            <input type="email" formControlName="email" maxlength="255" autocomplete="email" />
+          </label>
+          <label>
+            GSTIN
+            <input type="text" formControlName="gstin" maxlength="15" autocomplete="off" placeholder="Optional" />
+          </label>
+          <label>
+            Phone
+            <input type="tel" formControlName="phone" maxlength="20" autocomplete="tel" placeholder="Optional" />
+          </label>
+          <label>
+            Contact person
+            <input type="text" formControlName="contactName" maxlength="200" autocomplete="name" placeholder="Optional" />
+          </label>
+          <label class="buyer-address">
+            Billing address
+            <textarea formControlName="billingAddress" rows="2" maxlength="500" placeholder="Optional"></textarea>
+          </label>
+          <button class="btn-primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Add buyer' }}
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Your buyers</h2>
+        <label class="filter-field">
+          Filter
+          <input
+            type="text"
+            [value]="query()"
+            (input)="setQuery($any($event.target).value)"
+            placeholder="Search name, email, GSTIN, or contact"
+          />
+        </label>
+      </div>
+
+      @if (buyers().length === 0) {
+        <p class="empty">No buyers yet. Create one above and they will appear here for invoicing.</p>
+      } @else if (filtered().length === 0) {
+        <p class="empty">No buyers match “{{ query() }}”.</p>
+      } @else {
+        <div class="table-wrap">
+          <table class="ledger">
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Email</th>
+                <th>GSTIN</th>
+                <th>Phone</th>
+                <th>Contact</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (buyer of filtered(); track buyer.id) {
+                <tr>
+                  <td>{{ buyer.name }}</td>
+                  <td>{{ buyer.email || '—' }}</td>
+                  <td class="mono">{{ buyer.gstin || '—' }}</td>
+                  <td>{{ buyer.phone || '—' }}</td>
+                  <td>{{ buyer.contactName || '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+</section>

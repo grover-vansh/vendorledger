@@ -1,4 +1,4 @@
--- MSME pay-due tracker — Postgres schema (supplier catalog + invoices)
+-- MSME pay-due tracker — Postgres schema (seller catalog + invoices)
 -- Run: psql -U postgres -d paydue -f db/schema.sql
 
 CREATE TABLE supplier (
@@ -11,26 +11,21 @@ CREATE TABLE supplier (
 );
 
 CREATE TABLE buyer (
-    id              BIGSERIAL PRIMARY KEY,
-    name            VARCHAR(200) NOT NULL,
-    email           VARCHAR(255),
-    gstin           VARCHAR(15),
-    registered_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    id               BIGSERIAL PRIMARY KEY,
+    supplier_id      BIGINT NOT NULL REFERENCES supplier (id),
+    name             VARCHAR(200) NOT NULL,
+    email            VARCHAR(255),
+    gstin            VARCHAR(15),
+    phone            VARCHAR(20),
+    contact_name     VARCHAR(200),
+    billing_address  VARCHAR(500),
+    registered_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Same pair viewed two ways:
---   supplier portal: my buyers  = rows where supplier_id = me
---   buyer portal:     my suppliers = rows where buyer_id = me
-CREATE TABLE supplier_buyer (
-    id              BIGSERIAL PRIMARY KEY,
-    supplier_id     BIGINT NOT NULL REFERENCES supplier (id),
-    buyer_id        BIGINT NOT NULL REFERENCES buyer (id),
-    linked_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (supplier_id, buyer_id)
-);
-
-CREATE INDEX idx_supplier_buyer_supplier ON supplier_buyer (supplier_id);
-CREATE INDEX idx_supplier_buyer_buyer ON supplier_buyer (buyer_id);
+CREATE INDEX idx_buyer_supplier ON buyer (supplier_id);
+CREATE UNIQUE INDEX uq_buyer_supplier_name ON buyer (supplier_id, LOWER(name));
+CREATE UNIQUE INDEX uq_buyer_supplier_email ON buyer (supplier_id, LOWER(email)) WHERE email IS NOT NULL;
+CREATE UNIQUE INDEX uq_buyer_supplier_gstin ON buyer (supplier_id, gstin) WHERE gstin IS NOT NULL;
 
 CREATE TABLE product (
     id              BIGSERIAL PRIMARY KEY,
@@ -104,15 +99,14 @@ CREATE TABLE app_user (
     password_hash   VARCHAR(255) NOT NULL,
     role            VARCHAR(16) NOT NULL,
     supplier_id     BIGINT REFERENCES supplier (id),
-    buyer_id        BIGINT REFERENCES buyer (id),
+    company_name    VARCHAR(200),
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CHECK (role IN ('BUYER', 'SELLER', 'ADMIN')),
     CHECK (
-        (role = 'SELLER' AND supplier_id IS NOT NULL AND buyer_id IS NULL)
-        OR (role = 'BUYER' AND buyer_id IS NOT NULL AND supplier_id IS NULL)
-        OR (role = 'ADMIN' AND supplier_id IS NULL AND buyer_id IS NULL)
+        (role = 'SELLER' AND supplier_id IS NOT NULL)
+        OR (role = 'BUYER' AND supplier_id IS NULL)
+        OR (role = 'ADMIN' AND supplier_id IS NULL)
     )
 );
 
 CREATE INDEX idx_app_user_supplier ON app_user (supplier_id);
-CREATE INDEX idx_app_user_buyer ON app_user (buyer_id);

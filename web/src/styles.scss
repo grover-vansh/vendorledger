@@ -39,7 +39,8 @@ p {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
@@ -140,7 +141,9 @@ input[type="password"],
 input[type="text"],
 input[type="number"],
 input[type="date"],
-select {
+input[type="tel"],
+select,
+textarea {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -149,7 +152,8 @@ select {
 }
 
 input:focus,
-select:focus {
+select:focus,
+textarea:focus {
   outline: 2px solid var(--leaf);
   border-color: var(--leaf);
 }
@@ -290,7 +294,8 @@ select:focus {
 
 .sku-form,
 .sku-fields,
-.invoice-meta {
+.invoice-meta,
+.buyer-fields {
   display: grid;
   gap: 12px;
 }
@@ -304,6 +309,26 @@ select:focus {
 .invoice-meta {
   grid-template-columns: 1.4fr 1fr 0.9fr;
   padding-bottom: 12px;
+}
+
+.buyer-fields {
+  grid-template-columns: 1.2fr 1.2fr 0.9fr;
+  align-items: end;
+  padding-bottom: 14px;
+}
+
+.buyer-fields .buyer-address {
+  grid-column: 1 / -1;
+}
+
+.buyer-fields textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 64px;
+}
+
+.buyer-fields > .btn-primary {
+  width: fit-content;
 }
 
 .icon-btn {
@@ -402,6 +427,11 @@ select:focus {
 .empty {
   color: var(--muted);
   padding-bottom: 12px;
+}
+
+.empty a {
+  color: var(--leaf);
+  font-weight: 700;
 }
 
 .table-wrap {
@@ -519,7 +549,8 @@ select:focus {
 
   .inline-fields,
   .sku-fields,
-  .invoice-meta {
+  .invoice-meta,
+  .buyer-fields {
     grid-template-columns: 1fr;
   }
 

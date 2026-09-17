@@ -9,6 +9,7 @@ import com.paydue.api.dto.InvoiceResponse;
 import com.paydue.api.dto.ProductResponse;
 import com.paydue.api.dto.SupplierResponse;
 import com.paydue.api.dto.UserSummaryResponse;
+import com.paydue.domain.AppUser;
 import com.paydue.service.AuthService;
 import com.paydue.service.PaydueService;
 import com.paydue.security.CurrentUser;
@@ -77,42 +78,39 @@ public class PaydueController {
         return service.listProducts(supplierId);
     }
 
-    @PostMapping("/buyers")
+    @PostMapping("/suppliers/{supplierId}/buyers")
     @ResponseStatus(HttpStatus.CREATED)
-    public BuyerResponse createBuyer(@Valid @RequestBody CreateBuyerRequest request) {
-        currentUser.require();
-        return service.createBuyer(request);
-    }
-
-    @GetMapping("/buyers")
-    public List<BuyerResponse> listBuyers() {
-        currentUser.requireSellerOrAdmin();
-        return service.listBuyers();
-    }
-
-    @GetMapping("/buyers/{buyerId}")
-    public BuyerResponse getBuyer(@PathVariable Long buyerId) {
-        currentUser.requireBuyerOf(buyerId);
-        return service.getBuyer(buyerId);
-    }
-
-    @GetMapping("/buyers/{buyerId}/invoices")
-    public List<InvoiceResponse> listBuyerInvoices(@PathVariable Long buyerId) {
-        currentUser.requireBuyerOf(buyerId);
-        return service.listBuyerInvoices(buyerId);
-    }
-
-    @PostMapping("/suppliers/{supplierId}/buyers/{buyerId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public BuyerResponse linkBuyer(@PathVariable Long supplierId, @PathVariable Long buyerId) {
+    public BuyerResponse createBuyer(
+            @PathVariable Long supplierId,
+            @Valid @RequestBody CreateBuyerRequest request) {
         currentUser.requireSellerOf(supplierId);
-        return service.linkBuyer(supplierId, buyerId);
+        return service.createBuyer(supplierId, request);
     }
 
     @GetMapping("/suppliers/{supplierId}/buyers")
     public List<BuyerResponse> listMyBuyers(@PathVariable Long supplierId) {
         currentUser.requireSellerOf(supplierId);
         return service.listMyBuyers(supplierId);
+    }
+
+    @GetMapping("/buyers/{buyerId}")
+    public BuyerResponse getBuyer(@PathVariable Long buyerId) {
+        BuyerResponse buyer = service.getBuyer(buyerId);
+        currentUser.requireCanViewBuyer(buyer.supplierId(), buyer.email());
+        return buyer;
+    }
+
+    @GetMapping("/buyers/{buyerId}/invoices")
+    public List<InvoiceResponse> listBuyerInvoices(@PathVariable Long buyerId) {
+        BuyerResponse buyer = service.getBuyer(buyerId);
+        currentUser.requireCanViewBuyer(buyer.supplierId(), buyer.email());
+        return service.listBuyerInvoices(buyerId);
+    }
+
+    @GetMapping("/buyer/invoices")
+    public List<InvoiceResponse> listMyBuyerInvoices() {
+        AppUser user = currentUser.requireBuyer();
+        return service.listInvoicesForBuyerEmail(user.getEmail());
     }
 
     @PostMapping("/invoices")

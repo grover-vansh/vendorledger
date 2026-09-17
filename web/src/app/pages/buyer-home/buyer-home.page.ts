@@ -1,8 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
-import { forkJoin } from 'rxjs';
 import { apiErrorMessage } from '../../core/api-error';
 import { AuthService } from '../../core/auth.service';
-import { Buyer, Invoice } from '../../core/models';
+import { Invoice } from '../../core/models';
 import { PaydueApi } from '../../core/paydue.api';
 import { InvoiceTableComponent } from '../../shared/invoice-table.component';
 import { formatInr } from '../../shared/money';
@@ -18,7 +17,7 @@ export class BuyerHomePage {
 
   readonly loading = signal(true);
   readonly error = signal('');
-  readonly buyer = signal<Buyer | null>(null);
+  readonly companyName = this.auth.user()?.companyName || 'Your company';
   readonly invoices = signal<Invoice[]>([]);
   readonly formatInr = formatInr;
 
@@ -41,20 +40,9 @@ export class BuyerHomePage {
   }
 
   private load(): void {
-    const buyerId = this.auth.user()?.buyerId;
-    if (!buyerId) {
-      this.loading.set(false);
-      this.error.set('This buyer account is not linked to a buyer company.');
-      return;
-    }
-
-    forkJoin({
-      buyer: this.api.getBuyer(buyerId),
-      invoices: this.api.listBuyerInvoices(buyerId)
-    }).subscribe({
-      next: (data) => {
-        this.buyer.set(data.buyer);
-        this.invoices.set(data.invoices);
+    this.api.listMyBuyerInvoices().subscribe({
+      next: (invoices) => {
+        this.invoices.set(invoices);
         this.loading.set(false);
       },
       error: (err) => {

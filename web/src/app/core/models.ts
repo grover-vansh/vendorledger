@@ -8,6 +8,7 @@ export interface AuthResponse {
   role: UserRole;
   supplierId: number | null;
   buyerId: number | null;
+  companyName: string | null;
 }
 
 export interface RegisterRequest {
@@ -29,9 +30,13 @@ export interface Supplier {
 
 export interface Buyer {
   id: number;
+  supplierId: number;
   name: string;
   email: string | null;
   gstin: string | null;
+  phone: string | null;
+  contactName: string | null;
+  billingAddress: string | null;
   registeredAt: string;
 }
 

@@ -13,11 +13,9 @@ import com.paydue.domain.Invoice;
 import com.paydue.domain.InvoiceLine;
 import com.paydue.domain.Product;
 import com.paydue.domain.Supplier;
-import com.paydue.domain.SupplierBuyer;
 import com.paydue.repo.BuyerRepository;
 import com.paydue.repo.InvoiceRepository;
 import com.paydue.repo.ProductRepository;
-import com.paydue.repo.SupplierBuyerRepository;
 import com.paydue.repo.SupplierRepository;
 import com.paydue.web.error.ConflictException;
 import com.paydue.web.error.NotFoundException;
@@ -34,19 +32,16 @@ public class PaydueService {
 
     private final SupplierRepository suppliers;
     private final BuyerRepository buyers;
-    private final SupplierBuyerRepository links;
     private final ProductRepository products;
     private final InvoiceRepository invoices;
 
     public PaydueService(
             SupplierRepository suppliers,
             BuyerRepository buyers,
-            SupplierBuyerRepository links,
             ProductRepository products,
             InvoiceRepository invoices) {
         this.suppliers = suppliers;
         this.buyers = buyers;
-        this.links = links;
         this.products = products;
         this.invoices = invoices;
     }
@@ -90,34 +85,40 @@ public class PaydueService {
     }
 
     @Transactional
-    public BuyerResponse createBuyer(CreateBuyerRequest req) {
-        Buyer b = new Buyer();
-        b.setName(req.name().trim());
-        b.setEmail(req.email());
-        b.setGstin(req.gstin());
-        return toBuyer(buyers.save(b));
-    }
-
-    @Transactional
-    public BuyerResponse linkBuyer(Long supplierId, Long buyerId) {
+    public BuyerResponse createBuyer(Long supplierId, CreateBuyerRequest req) {
         Supplier supplier = requireSupplier(supplierId);
-        Buyer buyer = buyers.findById(buyerId)
-                .orElseThrow(() -> new NotFoundException("Buyer not found: " + buyerId));
-        if (links.existsBySupplierIdAndBuyerId(supplierId, buyerId)) {
-            throw new ConflictException("Buyer is already linked to this supplier");
+        String name = req.name().trim();
+        String email = req.email().trim().toLowerCase();
+        String gstin = normalizeGstin(req.gstin());
+        String phone = trimToNull(req.phone());
+        String contactName = trimToNull(req.contactName());
+        String billingAddress = trimToNull(req.billingAddress());
+
+        if (buyers.existsBySupplierIdAndNameIgnoreCase(supplierId, name)) {
+            throw new ConflictException("Buyer already exists for this seller: " + name);
         }
-        SupplierBuyer link = new SupplierBuyer();
-        link.setSupplier(supplier);
-        link.setBuyer(buyer);
-        links.save(link);
-        return toBuyer(buyer);
+        if (buyers.existsBySupplierIdAndEmailIgnoreCase(supplierId, email)) {
+            throw new ConflictException("Buyer email already exists for this seller");
+        }
+        if (gstin != null && buyers.existsBySupplierIdAndGstinIgnoreCase(supplierId, gstin)) {
+            throw new ConflictException("Buyer GSTIN already exists for this seller");
+        }
+
+        Buyer b = new Buyer();
+        b.setSupplier(supplier);
+        b.setName(name);
+        b.setEmail(email);
+        b.setGstin(gstin);
+        b.setPhone(phone);
+        b.setContactName(contactName);
+        b.setBillingAddress(billingAddress);
+        return toBuyer(buyers.save(b));
     }
 
     @Transactional(readOnly = true)
     public List<BuyerResponse> listMyBuyers(Long supplierId) {
         requireSupplier(supplierId);
-        return links.findBySupplierId(supplierId).stream()
-                .map(SupplierBuyer::getBuyer)
+        return buyers.findBySupplierIdOrderByNameAsc(supplierId).stream()
                 .map(this::toBuyer)
                 .toList();
     }
@@ -125,14 +126,8 @@ public class PaydueService {
     @Transactional
     public InvoiceResponse createInvoice(CreateInvoiceRequest req) {
         Supplier supplier = requireSupplier(req.supplierId());
-        Buyer buyer = buyers.findById(req.buyerId())
-                .orElseThrow(() -> new NotFoundException("Buyer not found: " + req.buyerId()));
-        if (!links.existsBySupplierIdAndBuyerId(req.supplierId(), req.buyerId())) {
-            SupplierBuyer link = new SupplierBuyer();
-            link.setSupplier(supplier);
-            link.setBuyer(buyer);
-            links.save(link);
-        }
+        Buyer buyer = buyers.findByIdAndSupplierId(req.buyerId(), req.supplierId())
+                .orElseThrow(() -> new NotFoundException("Buyer not found for this seller"));
         if (invoices.existsBySupplierIdAndInvoiceNumber(req.supplierId(), req.invoiceNumber())) {
             throw new ConflictException("Invoice number already used by this supplier");
         }
@@ -189,13 +184,15 @@ public class PaydueService {
     }
 
     @Transactional(readOnly = true)
-    public List<SupplierResponse> listSuppliers() {
-        return suppliers.findAll().stream().map(this::toSupplier).toList();
+    public List<InvoiceResponse> listInvoicesForBuyerEmail(String email) {
+        return invoices.findByBuyer_EmailIgnoreCaseOrderByInvoiceDateDesc(email).stream()
+                .map(this::toInvoice)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<BuyerResponse> listBuyers() {
-        return buyers.findAll().stream().map(this::toBuyer).toList();
+    public List<SupplierResponse> listSuppliers() {
+        return suppliers.findAll().stream().map(this::toSupplier).toList();
     }
 
     private Supplier requireSupplier(Long id) {
@@ -204,7 +201,7 @@ public class PaydueService {
     }
 
     private Buyer requireBuyer(Long id) {
-        return buyers.findById(id)
+        return buyers.findByIdWithSupplier(id)
                 .orElseThrow(() -> new NotFoundException("Buyer not found: " + id));
     }
 
@@ -232,7 +229,16 @@ public class PaydueService {
     }
 
     private BuyerResponse toBuyer(Buyer b) {
-        return new BuyerResponse(b.getId(), b.getName(), b.getEmail(), b.getGstin(), b.getRegisteredAt());
+        return new BuyerResponse(
+                b.getId(),
+                b.getSupplier().getId(),
+                b.getName(),
+                b.getEmail(),
+                b.getGstin(),
+                b.getPhone(),
+                b.getContactName(),
+                b.getBillingAddress(),
+                b.getRegisteredAt());
     }
 
     private InvoiceResponse toInvoice(Invoice invoice) {
@@ -267,5 +273,25 @@ public class PaydueService {
                 total,
                 daysOverdue,
                 lines);
+    }
+
+    private static String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private static String normalizeGstin(String gstin) {
+        String value = trimToNull(gstin);
+        if (value == null) {
+            return null;
+        }
+        value = value.replaceAll("\\s+", "").toUpperCase();
+        if (value.length() != 15) {
+            throw new IllegalArgumentException("GSTIN must be 15 characters");
+        }
+        return value;
     }
 }

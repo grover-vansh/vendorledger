@@ -57,11 +57,7 @@
                   <td class="mono muted">
                     @if (user.supplierId) {
                       supplier {{ user.supplierId }}
-                    }
-                    @if (user.buyerId) {
-                      buyer {{ user.buyerId }}
-                    }
-                    @if (!user.supplierId && !user.buyerId) {
+                    } @else {
                       —
                     }
                   </td>

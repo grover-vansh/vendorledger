@@ -13,12 +13,13 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     boolean existsByEmailIgnoreCase(String email);
 
     boolean existsBySupplier_NameIgnoreCase(String name);
-    boolean existsByBuyer_NameIgnoreCase(String name);
 
-    @EntityGraph(attributePaths = {"supplier", "buyer"})
+    boolean existsByRoleAndCompanyNameIgnoreCase(UserRole role, String name);
+
+    @EntityGraph(attributePaths = "supplier")
     Optional<AppUser> findByEmailIgnoreCase(String email);
 
-    @EntityGraph(attributePaths = {"supplier", "buyer"})
+    @EntityGraph(attributePaths = "supplier")
     @Query("select u from AppUser u order by u.id")
     List<AppUser> findAllWithCompanies();
 }

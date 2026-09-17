@@ -9,7 +9,8 @@ public record AuthResponse(
         String email,
         UserRole role,
         Long supplierId,
-        Long buyerId
+        Long buyerId,
+        String companyName
 ) {
     public static AuthResponse bearer(
             String token,
@@ -17,7 +18,8 @@ public record AuthResponse(
             String email,
             UserRole role,
             Long supplierId,
-            Long buyerId) {
-        return new AuthResponse(token, "Bearer", userId, email, role, supplierId, buyerId);
+            Long buyerId,
+            String companyName) {
+        return new AuthResponse(token, "Bearer", userId, email, role, supplierId, buyerId, companyName);
     }
 }

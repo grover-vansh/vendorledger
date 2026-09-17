@@ -31,7 +31,7 @@
             <select formControlName="buyerId">
               <option [ngValue]="null">Select a buyer</option>
               @for (buyer of buyers(); track buyer.id) {
-                <option [ngValue]="buyer.id">{{ buyer.name }}</option>
+                <option [ngValue]="buyer.id">{{ buyerLabel(buyer) }}</option>
               }
             </select>
           </label>
@@ -45,7 +45,11 @@
           </label>
         </div>
         @if (buyers().length === 0) {
-          <p class="empty">No buyer companies are registered yet. A buyer must exist before you can raise an invoice.</p>
+          <p class="empty">
+            No buyers in your list yet.
+            <a routerLink="/seller/buyers">Add a buyer</a>
+            before raising an invoice.
+          </p>
         }
         @if (products().length === 0) {
           <p class="empty">Add SKUs first — the line-item dropdown is filled from your catalogue.</p>

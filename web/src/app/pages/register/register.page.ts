@@ -26,7 +26,7 @@ export class RegisterPage {
   readonly submitting = signal(false);
   readonly roles: { value: UserRole; title: string; copy: string }[] = [
     { value: 'SELLER', title: 'Seller', copy: 'Issue invoices and watch the 45-day clock.' },
-    { value: 'BUYER', title: 'Buyer', copy: 'See bills your suppliers have raised on you.' },
+    { value: 'BUYER', title: 'Buyer', copy: 'See bills sellers raise against this email.' },
     { value: 'ADMIN', title: 'Admin', copy: 'Oversee users and supplier companies.' }
   ];
 

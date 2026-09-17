@@ -71,6 +71,10 @@ export class SellerInvoicePage {
     return `${product.skuCode} — ${product.name}`;
   }
 
+  buyerLabel(buyer: Buyer): string {
+    return buyer.gstin ? `${buyer.name} — ${buyer.gstin}` : buyer.name;
+  }
+
   submit(): void {
     this.formError.set('');
     const supplierId = this.auth.user()?.supplierId;
@@ -148,7 +152,7 @@ export class SellerInvoicePage {
 
     forkJoin({
       products: this.api.listProducts(supplierId),
-      buyers: this.api.listBuyers()
+      buyers: this.api.listMyBuyers(supplierId)
     }).subscribe({
       next: (data) => {
         this.products.set(data.products.filter((product) => product.active));

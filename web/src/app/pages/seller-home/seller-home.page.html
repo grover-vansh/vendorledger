@@ -8,6 +8,7 @@
   </header>
 
   <div class="action-row">
+    <a class="btn-action" routerLink="/seller/buyers">Add Buyers</a>
     <a class="btn-action" routerLink="/seller/skus">Add SKUs</a>
     <a class="btn-action" routerLink="/seller/invoices/new">Raise invoice</a>
   </div>
@@ -31,7 +32,7 @@
         <strong>{{ products().length }}</strong>
       </article>
       <article class="kpi">
-        <span>Linked buyers</span>
+        <span>Your buyers</span>
         <strong>{{ customerCount() }}</strong>
       </article>
     </div>
@@ -40,7 +41,7 @@
       <h2>Recent invoices</h2>
       @if (invoices().length === 0) {
         <p class="empty">
-          No invoices yet. Add SKUs and link buyers, then raise a bill — PayDue will default due date to invoice date + 45 days.
+          No invoices yet. Add buyers and SKUs, then raise a bill — PayDue will default due date to invoice date + 45 days.
         </p>
       } @else {
         <app-invoice-table [invoices]="invoices()" party="buyer" />

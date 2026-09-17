@@ -14,4 +14,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     @EntityGraph(attributePaths = {"lines", "lines.product", "supplier", "buyer"})
     List<Invoice> findByBuyerIdOrderByInvoiceDateDesc(Long buyerId);
+
+    @EntityGraph(attributePaths = {"lines", "lines.product", "supplier", "buyer"})
+    List<Invoice> findByBuyer_EmailIgnoreCaseOrderByInvoiceDateDesc(String email);
 }

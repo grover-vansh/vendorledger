@@ -14,12 +14,22 @@ export class PaydueApi {
     return this.http.get<Product[]>(`/api/suppliers/${supplierId}/products`);
   }
 
-  listLinkedBuyers(supplierId: number) {
+  listMyBuyers(supplierId: number) {
     return this.http.get<Buyer[]>(`/api/suppliers/${supplierId}/buyers`);
   }
 
-  listBuyers() {
-    return this.http.get<Buyer[]>('/api/buyers');
+  createBuyer(
+    supplierId: number,
+    body: {
+      name: string;
+      email: string;
+      gstin?: string | null;
+      phone?: string | null;
+      contactName?: string | null;
+      billingAddress?: string | null;
+    }
+  ) {
+    return this.http.post<Buyer>(`/api/suppliers/${supplierId}/buyers`, body);
   }
 
   listSupplierInvoices(supplierId: number) {
@@ -44,12 +54,8 @@ export class PaydueApi {
     return this.http.post<Invoice>('/api/invoices', body);
   }
 
-  getBuyer(buyerId: number) {
-    return this.http.get<Buyer>(`/api/buyers/${buyerId}`);
-  }
-
-  listBuyerInvoices(buyerId: number) {
-    return this.http.get<Invoice[]>(`/api/buyers/${buyerId}/invoices`);
+  listMyBuyerInvoices() {
+    return this.http.get<Invoice[]>('/api/buyer/invoices');
   }
 
   listSuppliers() {

@@ -34,9 +34,8 @@ public class AppUser {
     @JoinColumn(name = "supplier_id")
     private Supplier supplier;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "buyer_id")
-    private Buyer buyer;
+    @Column(name = "company_name", length = 200)
+    private String companyName;
 
     public Long getId() {
         return id;
@@ -74,11 +73,11 @@ public class AppUser {
         this.supplier = supplier;
     }
 
-    public Buyer getBuyer() {
-        return buyer;
+    public String getCompanyName() {
+        return companyName;
     }
 
-    public void setBuyer(Buyer buyer) {
-        this.buyer = buyer;
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 }

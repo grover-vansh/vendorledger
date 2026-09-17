@@ -32,29 +32,35 @@ public class CurrentUser {
         throw new ForbiddenException("Not allowed to act as this seller");
     }
 
-    public void requireBuyerOf(Long buyerId) {
+    public AppUser requireBuyer() {
+        AppUser user = require();
+        if (user.getRole() != UserRole.BUYER) {
+            throw new ForbiddenException("Buyer only");
+        }
+        return user;
+    }
+
+    public void requireCanViewBuyer(Long ownerSupplierId, String buyerEmail) {
         AppUser user = require();
         if (user.getRole() == UserRole.ADMIN) {
             return;
         }
-        if (user.getRole() == UserRole.BUYER
-                && user.getBuyer() != null
-                && user.getBuyer().getId().equals(buyerId)) {
+        if (user.getRole() == UserRole.SELLER
+                && user.getSupplier() != null
+                && user.getSupplier().getId().equals(ownerSupplierId)) {
             return;
         }
-        throw new ForbiddenException("Not allowed to act as this buyer");
+        if (user.getRole() == UserRole.BUYER
+                && buyerEmail != null
+                && buyerEmail.equalsIgnoreCase(user.getEmail())) {
+            return;
+        }
+        throw new ForbiddenException("Not allowed to view this buyer");
     }
 
     public void requireAdmin() {
         if (require().getRole() != UserRole.ADMIN) {
             throw new ForbiddenException("Admin only");
-        }
-    }
-
-    public void requireSellerOrAdmin() {
-        AppUser user = require();
-        if (user.getRole() == UserRole.BUYER) {
-            throw new ForbiddenException("Sellers and admins only");
         }
     }
 }
