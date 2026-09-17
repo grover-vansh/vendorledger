@@ -1,0 +1,103 @@
+<section class="dash">
+  <p class="page-back">
+    <a routerLink="/seller">← Seller workspace</a>
+  </p>
+
+  <header class="dash-head">
+    <div>
+      <p class="eyebrow">Catalogue</p>
+      <h1>Add SKUs</h1>
+      <p class="muted">Create products you sell, then filter the list as the catalogue grows.</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <p class="muted">Loading SKUs…</p>
+  } @else if (error()) {
+    <p class="form-error" role="alert">{{ error() }}</p>
+  } @else {
+    <section class="panel">
+      <h2>New SKU</h2>
+      <form class="sku-form" [formGroup]="form" (ngSubmit)="createSku()">
+        @if (formError()) {
+          <p class="form-error" role="alert">{{ formError() }}</p>
+        }
+        <div class="sku-fields">
+          <label>
+            SKU code
+            <input type="text" formControlName="skuCode" autocomplete="off" />
+          </label>
+          <label>
+            Product name
+            <input type="text" formControlName="name" autocomplete="off" />
+          </label>
+          <label>
+            Type
+            <select formControlName="productType">
+              @for (type of productTypes; track type) {
+                <option [value]="type">{{ type }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            Shelf life (days)
+            <input type="number" formControlName="shelfLifeDays" min="1" step="1" placeholder="Optional" />
+          </label>
+          <button class="btn-primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Create SKU' }}
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Current SKUs</h2>
+        <label class="filter-field">
+          Filter
+          <input
+            type="text"
+            [value]="query()"
+            (input)="setQuery($any($event.target).value)"
+            placeholder="Search code, name, or type"
+          />
+        </label>
+      </div>
+
+      @if (products().length === 0) {
+        <p class="empty">No SKUs yet. Create one above and it will appear here.</p>
+      } @else if (filtered().length === 0) {
+        <p class="empty">No SKUs match “{{ query() }}”.</p>
+      } @else {
+        <div class="table-wrap">
+          <table class="ledger">
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Shelf life</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of filtered(); track product.id) {
+                <tr>
+                  <td class="mono">{{ product.skuCode }}</td>
+                  <td>{{ product.name }}</td>
+                  <td>{{ product.productType }}</td>
+                  <td>{{ product.shelfLifeDays ? product.shelfLifeDays + ' days' : '—' }}</td>
+                  <td>
+                    <span class="pill" [class.is-paid]="product.active" [class.is-open]="!product.active">
+                      {{ product.active ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+</section>

@@ -137,7 +137,10 @@ label {
 
 input[type="email"],
 input[type="password"],
-input[type="text"] {
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -145,7 +148,8 @@ input[type="text"] {
   background: #fff;
 }
 
-input:focus {
+input:focus,
+select:focus {
   outline: 2px solid var(--leaf);
   border-color: var(--leaf);
 }
@@ -227,7 +231,128 @@ input:focus {
 }
 
 .dash-head {
-  margin-bottom: 22px;
+  margin-bottom: 18px;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 20px;
+}
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  padding: 10px 16px;
+  background: var(--panel);
+  color: #f4efe4;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-action:hover {
+  background: var(--leaf);
+}
+
+.page-back {
+  margin: 0 0 10px;
+}
+
+.page-back a {
+  color: var(--leaf);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.page-back a:hover {
+  text-decoration: underline;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.panel-head h2 {
+  margin: 0;
+}
+
+.filter-field {
+  min-width: min(280px, 100%);
+}
+
+.sku-form,
+.sku-fields,
+.invoice-meta {
+  display: grid;
+  gap: 12px;
+}
+
+.sku-fields {
+  grid-template-columns: 1fr 1.4fr 0.9fr 0.9fr auto;
+  align-items: end;
+  padding-bottom: 14px;
+}
+
+.invoice-meta {
+  grid-template-columns: 1.4fr 1fr 0.9fr;
+  padding-bottom: 12px;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: #f4efe4;
+  cursor: pointer;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.icon-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.icon-btn-muted {
+  background: #fff;
+  color: var(--ink);
+}
+
+.invoice-lines td {
+  vertical-align: middle;
+}
+
+.invoice-total {
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 12px;
+  padding: 8px 0 14px;
+}
+
+.invoice-total span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.invoice-total strong {
+  font-family: var(--serif);
+  font-size: 1.45rem;
 }
 
 .dash-head h1 {
@@ -392,7 +517,14 @@ input:focus {
     padding: 32px 20px 48px;
   }
 
-  .inline-fields {
+  .inline-fields,
+  .sku-fields,
+  .invoice-meta {
     grid-template-columns: 1fr;
+  }
+
+  .panel-head {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

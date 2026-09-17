@@ -7,6 +7,8 @@ import { HomeRedirectComponent } from './pages/home-redirect.component';
 import { LoginPage } from './pages/login/login.page';
 import { RegisterPage } from './pages/register/register.page';
 import { SellerHomePage } from './pages/seller-home/seller-home.page';
+import { SellerInvoicePage } from './pages/seller-invoice/seller-invoice.page';
+import { SellerSkusPage } from './pages/seller-skus/seller-skus.page';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage, canActivate: [guestGuard] },
@@ -17,6 +19,8 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: 'seller', component: SellerHomePage, canActivate: [roleGuard('SELLER')] },
+      { path: 'seller/skus', component: SellerSkusPage, canActivate: [roleGuard('SELLER')] },
+      { path: 'seller/invoices/new', component: SellerInvoicePage, canActivate: [roleGuard('SELLER')] },
       { path: 'buyer', component: BuyerHomePage, canActivate: [roleGuard('BUYER')] },
       { path: 'admin', component: AdminHomePage, canActivate: [roleGuard('ADMIN')] },
       { path: '', pathMatch: 'full', component: HomeRedirectComponent, canActivate: [homeRedirectGuard] }

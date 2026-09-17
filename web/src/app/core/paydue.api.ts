@@ -18,8 +18,30 @@ export class PaydueApi {
     return this.http.get<Buyer[]>(`/api/suppliers/${supplierId}/buyers`);
   }
 
+  listBuyers() {
+    return this.http.get<Buyer[]>('/api/buyers');
+  }
+
   listSupplierInvoices(supplierId: number) {
     return this.http.get<Invoice[]>(`/api/suppliers/${supplierId}/invoices`);
+  }
+
+  createProduct(
+    supplierId: number,
+    body: { skuCode: string; name: string; productType?: string; shelfLifeDays?: number | null }
+  ) {
+    return this.http.post<Product>(`/api/suppliers/${supplierId}/products`, body);
+  }
+
+  createInvoice(body: {
+    supplierId: number;
+    buyerId: number;
+    invoiceNumber: string;
+    invoiceDate: string;
+    dueDate?: string;
+    lines: { productId: number; quantity: number; unitPrice: number }[];
+  }) {
+    return this.http.post<Invoice>('/api/invoices', body);
   }
 
   getBuyer(buyerId: number) {

@@ -51,6 +51,17 @@ public class AuthService {
             throw new ConflictException("Email already registered");
         }
 
+        if (req.role() == UserRole.SELLER) {
+            if (users.existsBySupplier_NameIgnoreCase(req.name())) {
+                throw new ConflictException("Seller already registered");
+            }
+        }
+
+        if (req.role() == UserRole.BUYER) {
+            if (users.existsByBuyer_NameIgnoreCase(req.name())) {
+                throw new ConflictException("Buyer already registered");
+            }
+        }
         AppUser user = new AppUser();
         user.setEmail(email);
         user.setPasswordHash(passwords.encode(req.password()));

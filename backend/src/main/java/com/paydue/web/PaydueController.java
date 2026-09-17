@@ -84,6 +84,12 @@ public class PaydueController {
         return service.createBuyer(request);
     }
 
+    @GetMapping("/buyers")
+    public List<BuyerResponse> listBuyers() {
+        currentUser.requireSellerOrAdmin();
+        return service.listBuyers();
+    }
+
     @GetMapping("/buyers/{buyerId}")
     public BuyerResponse getBuyer(@PathVariable Long buyerId) {
         currentUser.requireBuyerOf(buyerId);

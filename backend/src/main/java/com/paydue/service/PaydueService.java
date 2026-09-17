@@ -128,7 +128,10 @@ public class PaydueService {
         Buyer buyer = buyers.findById(req.buyerId())
                 .orElseThrow(() -> new NotFoundException("Buyer not found: " + req.buyerId()));
         if (!links.existsBySupplierIdAndBuyerId(req.supplierId(), req.buyerId())) {
-            throw new ConflictException("Buyer is not linked to this supplier");
+            SupplierBuyer link = new SupplierBuyer();
+            link.setSupplier(supplier);
+            link.setBuyer(buyer);
+            links.save(link);
         }
         if (invoices.existsBySupplierIdAndInvoiceNumber(req.supplierId(), req.invoiceNumber())) {
             throw new ConflictException("Invoice number already used by this supplier");
@@ -188,6 +191,11 @@ public class PaydueService {
     @Transactional(readOnly = true)
     public List<SupplierResponse> listSuppliers() {
         return suppliers.findAll().stream().map(this::toSupplier).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<BuyerResponse> listBuyers() {
+        return buyers.findAll().stream().map(this::toBuyer).toList();
     }
 
     private Supplier requireSupplier(Long id) {

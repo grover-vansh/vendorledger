@@ -50,4 +50,11 @@ public class CurrentUser {
             throw new ForbiddenException("Admin only");
         }
     }
+
+    public void requireSellerOrAdmin() {
+        AppUser user = require();
+        if (user.getRole() == UserRole.BUYER) {
+            throw new ForbiddenException("Sellers and admins only");
+        }
+    }
 }

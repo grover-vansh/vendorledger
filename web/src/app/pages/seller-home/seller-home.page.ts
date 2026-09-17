@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { apiErrorMessage } from '../../core/api-error';
 import { AuthService } from '../../core/auth.service';
@@ -9,7 +10,7 @@ import { formatInr } from '../../shared/money';
 
 @Component({
   selector: 'app-seller-home',
-  imports: [InvoiceTableComponent],
+  imports: [InvoiceTableComponent, RouterLink],
   templateUrl: './seller-home.page.html'
 })
 export class SellerHomePage {
